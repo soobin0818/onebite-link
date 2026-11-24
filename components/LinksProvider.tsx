@@ -1,11 +1,13 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode } from "react";
+import { LINK_COLUMNS, toLinkItem } from "@/lib/links";
 import type { LinkItem } from "@/lib/types";
+import { createClient } from "@/utils/supabase/client";
 
 type LinksContextValue = {
   links: LinkItem[];
-  addLink: (link: Omit<LinkItem, "id">) => void;
+  addLink: (link: Omit<LinkItem, "id">) => Promise<void>;
   removeLink: (id: number) => void;
   updateLink: (
     id: number,
@@ -26,13 +28,24 @@ export default function LinksProvider({
 }: LinksProviderProps) {
   const [links, setLinks] = useState(initialLinks);
 
-  const addLink = (link: Omit<LinkItem, "id">) => {
-    // TODO: 서버 저장 기능 구현 (현재는 클라이언트 상태에만 추가)
+  const addLink = async (link: Omit<LinkItem, "id">) => {
+    // links 테이블에 저장하고, DB가 발급한 id로 목록에 추가
+    const { data, error } = await createClient()
+      .from("links")
+      .insert({
+        url: link.url,
+        title: link.title,
+        description: link.description,
+        thumbnail_url: link.image ?? null,
+        folder_id: link.folderId,
+      })
+      .select(LINK_COLUMNS)
+      .single();
+
+    if (error) throw new Error(`링크를 저장하지 못했습니다: ${error.message}`);
+
     // 최근에 저장한 링크가 먼저 보이도록 앞에 추가
-    setLinks((prev) => [
-      { ...link, id: Math.max(0, ...prev.map((l) => l.id)) + 1 },
-      ...prev,
-    ]);
+    setLinks((prev) => [toLinkItem(data), ...prev]);
   };
 
   const removeLink = (id: number) => {

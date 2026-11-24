@@ -73,7 +73,7 @@ export default function EditLinkDialog({ link, onClose }: EditLinkDialogProps) {
           <FolderSelect
             name="folderId"
             folders={folders}
-            defaultValue={link.folderId}
+            defaultValue={link.folderId ?? undefined}
           />
 
           <label className="flex flex-col gap-2">

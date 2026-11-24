@@ -10,7 +10,8 @@ export type LinkItem = {
   description: string;
   /** 오픈 그래프 썸네일 이미지 주소 */
   image?: string;
-  folderId: number;
+  /** 폴더가 삭제되면 null */
+  folderId: number | null;
 };
 
 /** /api/og 응답 */

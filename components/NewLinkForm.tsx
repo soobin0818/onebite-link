@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import LinkUrlInput from "@/components/LinkUrlInput";
 import FolderSelect from "@/components/FolderSelect";
@@ -13,15 +13,20 @@ export default function NewLinkForm() {
   const { addLink } = useLinks();
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const pendingRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // state는 다음 렌더에 반영되므로, 같은 틱의 연속 클릭까지 막기 위해 ref로도 잠근다
+    if (pendingRef.current) return;
     const formData = new FormData(e.currentTarget);
     const url = String(formData.get("url") ?? "").trim();
     const folderId = Number(formData.get("folderId"));
 
+    pendingRef.current = true;
     setPending(true);
+    let saved = false;
     setError(null);
 
     try {
@@ -45,18 +50,23 @@ export default function NewLinkForm() {
         };
       }
 
-      addLink({
+      await addLink({
         url: og.url,
         title: og.title,
         description: og.description,
         image: og.image ?? undefined,
         folderId,
       });
+      // 저장에 성공하면 페이지를 떠날 때까지 잠금을 유지해 재클릭으로 중복 저장되지 않게 한다
+      saved = true;
       router.push(`/folder/${folderId}`);
     } catch {
       setError("링크를 저장하지 못했어요. 잠시 후 다시 시도해 주세요.");
     } finally {
-      setPending(false);
+      if (!saved) {
+        pendingRef.current = false;
+        setPending(false);
+      }
     }
   };
 
