@@ -7,6 +7,10 @@ type LinksContextValue = {
   links: LinkItem[];
   addLink: (link: Omit<LinkItem, "id">) => void;
   removeLink: (id: number) => void;
+  updateLink: (
+    id: number,
+    changes: Pick<LinkItem, "folderId" | "title" | "description">,
+  ) => void;
 };
 
 const LinksContext = createContext<LinksContextValue | null>(null);
@@ -36,8 +40,13 @@ export default function LinksProvider({
     setLinks((prev) => prev.filter((l) => l.id !== id));
   };
 
+  const updateLink: LinksContextValue["updateLink"] = (id, changes) => {
+    // TODO: 서버 수정 기능 구현 (현재는 클라이언트 상태에서만 변경)
+    setLinks((prev) => prev.map((l) => (l.id === id ? { ...l, ...changes } : l)));
+  };
+
   return (
-    <LinksContext value={{ links, addLink, removeLink }}>
+    <LinksContext value={{ links, addLink, removeLink, updateLink }}>
       {children}
     </LinksContext>
   );

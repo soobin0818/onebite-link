@@ -108,7 +108,7 @@ body {
   color: #bf3f3f;
 }
 
-/* 링크 카드: 마우스를 올리면 우측 상단에 삭제 버튼 노출 */
+/* 링크 카드: 마우스를 올리면 우측 상단에 수정/삭제 버튼 노출 */
 .link-item:hover > a {
   background: var(--bg);
   border-color: #d3d3cf;
@@ -116,19 +116,22 @@ body {
 /* 썸네일 없는 카드는 제목이 버튼 아래로 가려지지 않게 여백 확보 */
 .link-item:hover > a > .flex:first-child > .link-card-head,
 .link-item:focus-within > a > .flex:first-child > .link-card-head {
-  padding-right: 32px;
+  padding-right: 68px;
 }
-.link-delete {
+.link-actions {
   opacity: 0;
   pointer-events: none;
 }
-.link-item:hover .link-delete,
-.link-delete:focus-visible {
+.link-item:hover .link-actions,
+.link-actions:has(:focus-visible) {
   opacity: 1;
   pointer-events: auto;
 }
-.link-delete:hover {
+.link-action:hover {
   background: var(--hover-bg);
+  color: var(--text);
+}
+.link-action-danger:hover {
   color: #bf3f3f;
 }
 

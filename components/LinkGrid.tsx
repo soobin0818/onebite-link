@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import EditLinkDialog from "@/components/EditLinkDialog";
 import LinkCard from "@/components/LinkCard";
 import { useLinks } from "@/components/LinksProvider";
+import PencilIcon from "@/components/PencilIcon";
 import TrashIcon from "@/components/TrashIcon";
 import type { LinkItem } from "@/lib/types";
 
@@ -14,6 +16,7 @@ type LinkGridProps = {
 
 export default function LinkGrid({ folderId }: LinkGridProps) {
   const { links, removeLink } = useLinks();
+  const [editTarget, setEditTarget] = useState<LinkItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<LinkItem | null>(null);
   const visibleLinks =
     folderId === undefined
@@ -36,19 +39,32 @@ export default function LinkGrid({ folderId }: LinkGridProps) {
           {visibleLinks.map((link) => (
             <li key={link.id} className="link-item relative">
               <LinkCard link={link} />
-              <button
-                type="button"
-                onClick={() => setDeleteTarget(link)}
-                aria-label={`${link.title} 링크 삭제`}
-                title="링크 삭제"
-                className="link-delete transition-color absolute top-2 right-2 flex size-8 items-center justify-center rounded-md border border-[var(--border)] bg-[var(--card)] text-[var(--text-sub)]"
-              >
-                <TrashIcon />
-              </button>
+              <div className="link-actions transition-color absolute top-2 right-2 flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setEditTarget(link)}
+                  aria-label={`${link.title} 링크 수정`}
+                  title="링크 수정"
+                  className="link-action transition-color flex size-8 items-center justify-center rounded-md border border-[var(--border)] bg-[var(--card)] text-[var(--text-sub)]"
+                >
+                  <PencilIcon />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeleteTarget(link)}
+                  aria-label={`${link.title} 링크 삭제`}
+                  title="링크 삭제"
+                  className="link-action link-action-danger transition-color flex size-8 items-center justify-center rounded-md border border-[var(--border)] bg-[var(--card)] text-[var(--text-sub)]"
+                >
+                  <TrashIcon />
+                </button>
+              </div>
             </li>
           ))}
         </ul>
       )}
+
+      <EditLinkDialog link={editTarget} onClose={() => setEditTarget(null)} />
 
       <ConfirmDialog
         open={deleteTarget !== null}
