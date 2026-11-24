@@ -8,12 +8,15 @@ type SidebarProps = {
 
 export default function Sidebar({ folders }: SidebarProps) {
   return (
-    <aside className="w-56 shrink-0 border-r border-zinc-200 p-4 dark:border-zinc-800">
-      <nav className="flex flex-col gap-4">
-        <SidebarLink href="/">All</SidebarLink>
-        <div className="flex flex-col gap-2">
-          <h2 className="px-3 text-xs font-medium uppercase tracking-wider text-zinc-400">
-            Folders
+    <aside className="w-60 shrink-0 border-r border-[var(--border)] bg-[var(--hover-bg)]/50 px-2 py-4">
+      <nav className="sticky top-16 flex flex-col gap-4">
+        <SidebarLink href="/">
+          <span aria-hidden>🏠</span>
+          전체 링크
+        </SidebarLink>
+        <div className="flex flex-col gap-1">
+          <h2 className="px-3 pb-1 text-xs leading-[1.4] font-semibold text-[var(--text-sub)]">
+            폴더
           </h2>
           <FolderList folders={folders} />
         </div>

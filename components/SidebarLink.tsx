@@ -17,10 +17,10 @@ export default function SidebarLink({ href, children }: SidebarLinkProps) {
     <Link
       href={href}
       aria-current={isActive ? "page" : undefined}
-      className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
+      className={`transition-color item-hover flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-sm leading-[1.4] ${
         isActive
-          ? "bg-zinc-100 font-semibold text-foreground dark:bg-zinc-900"
-          : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900"
+          ? "bg-[var(--hover-bg)] font-semibold text-[var(--text)]"
+          : "text-[var(--text-sub)]"
       }`}
     >
       {children}

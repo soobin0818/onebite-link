@@ -12,18 +12,22 @@ export default function LinkCard({ link }: LinkCardProps) {
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-5 transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800"
+      className="transition-color card-hover flex h-full flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--card)] p-4"
     >
       <div className="flex items-center gap-3">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-sm font-bold uppercase dark:bg-zinc-900">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-[var(--hover-bg)] text-sm font-semibold uppercase">
           {hostname[0]}
         </span>
         <div className="min-w-0">
-          <h3 className="truncate font-semibold">{link.title}</h3>
-          <p className="truncate text-xs text-zinc-500">{hostname}</p>
+          <h3 className="truncate text-base leading-[1.4] font-semibold">
+            {link.title}
+          </h3>
+          <p className="truncate text-[13px] leading-[1.4] text-[var(--text-sub)]">
+            {hostname}
+          </p>
         </div>
       </div>
-      <p className="line-clamp-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="line-clamp-2 text-sm leading-[1.4] text-[var(--text-sub)]">
         {link.description}
       </p>
     </a>

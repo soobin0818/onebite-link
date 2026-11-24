@@ -7,7 +7,7 @@ type FolderListProps = {
 
 export default function FolderList({ folders }: FolderListProps) {
   return (
-    <ul className="flex flex-col gap-1">
+    <ul className="flex flex-col gap-0.5">
       {folders.map((folder) => (
         <li key={folder.id}>
           <SidebarLink href={`/folder/${folder.id}`}>
