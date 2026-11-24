@@ -12,7 +12,7 @@ type LinksContextValue = {
   updateLink: (
     id: number,
     changes: Pick<LinkItem, "folderId" | "title" | "description">,
-  ) => void;
+  ) => Promise<void>;
 };
 
 const LinksContext = createContext<LinksContextValue | null>(null);
@@ -53,8 +53,19 @@ export default function LinksProvider({
     setLinks((prev) => prev.filter((l) => l.id !== id));
   };
 
-  const updateLink: LinksContextValue["updateLink"] = (id, changes) => {
-    // TODO: 서버 수정 기능 구현 (현재는 클라이언트 상태에서만 변경)
+  const updateLink: LinksContextValue["updateLink"] = async (id, changes) => {
+    // links 테이블을 수정하고, 성공하면 목록에도 반영
+    const { error } = await createClient()
+      .from("links")
+      .update({
+        title: changes.title,
+        description: changes.description,
+        folder_id: changes.folderId,
+      })
+      .eq("id", id);
+
+    if (error) throw new Error(`링크를 수정하지 못했습니다: ${error.message}`);
+
     setLinks((prev) => prev.map((l) => (l.id === id ? { ...l, ...changes } : l)));
   };
 

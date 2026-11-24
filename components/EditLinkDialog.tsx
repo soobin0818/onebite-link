@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import FolderSelect from "@/components/FolderSelect";
 import { useFolders } from "@/components/FoldersProvider";
 import { useLinks } from "@/components/LinksProvider";
@@ -18,6 +18,7 @@ export default function EditLinkDialog({ link, onClose }: EditLinkDialogProps) {
   const titleId = useId();
   const { folders } = useFolders();
   const { updateLink } = useLinks();
+  const [isPending, setIsPending] = useState(false);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -28,19 +29,26 @@ export default function EditLinkDialog({ link, onClose }: EditLinkDialogProps) {
 
   const close = () => dialogRef.current?.close();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!link) return;
+    if (!link || isPending) return;
     const formData = new FormData(e.currentTarget);
     const title = String(formData.get("title") ?? "").trim();
     if (!title) return;
 
-    updateLink(link.id, {
-      folderId: Number(formData.get("folderId")),
-      title,
-      description: String(formData.get("description") ?? "").trim(),
-    });
-    close();
+    setIsPending(true);
+    try {
+      await updateLink(link.id, {
+        folderId: Number(formData.get("folderId")),
+        title,
+        description: String(formData.get("description") ?? "").trim(),
+      });
+      close();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "링크를 수정하지 못했습니다.");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -111,9 +119,10 @@ export default function EditLinkDialog({ link, onClose }: EditLinkDialogProps) {
             </button>
             <button
               type="submit"
+              disabled={isPending}
               className="transition-color btn-primary rounded-md px-4 py-2 text-sm font-medium"
             >
-              저장
+              {isPending ? "저장 중..." : "저장"}
             </button>
           </div>
         </form>
