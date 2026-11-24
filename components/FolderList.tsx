@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useFolders } from "@/components/FoldersProvider";
@@ -17,8 +17,8 @@ export default function FolderList() {
   const editDialogRef = useRef<HTMLDialogElement>(null);
   const [editTarget, setEditTarget] = useState<Folder | null>(null);
   const [editName, setEditName] = useState("");
+  const [isEditPending, setIsEditPending] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Folder | null>(null);
-  const [, startTransition] = useTransition();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -34,21 +34,34 @@ export default function FolderList() {
   const canSaveEdit =
     trimmedEditName !== "" && trimmedEditName !== editTarget?.name;
 
-  const handleEdit = (e: FormEvent<HTMLFormElement>) => {
+  const handleEdit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!editTarget || !canSaveEdit) return;
-    renameFolder(editTarget.id, trimmedEditName);
-    closeEdit();
+    if (!editTarget || !canSaveEdit || isEditPending) return;
+
+    setIsEditPending(true);
+    try {
+      await renameFolder(editTarget.id, trimmedEditName);
+      closeEdit();
+    } catch (error) {
+      alert(
+        error instanceof Error ? error.message : "폴더 이름을 수정하지 못했습니다.",
+      );
+    } finally {
+      setIsEditPending(false);
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteTarget) return;
     const id = deleteTarget.id;
-    // 보고 있던 폴더를 삭제하면 홈으로 이동 (이동과 삭제를 같은 transition으로 묶어 404 깜빡임 방지)
-    startTransition(() => {
-      if (pathname === `/folder/${id}`) router.push("/");
-      removeFolder(id);
-    });
+    try {
+      // 보고 있던 폴더를 삭제하면 홈으로 이동
+      await removeFolder(id, () => {
+        if (pathname === `/folder/${id}`) router.push("/");
+      });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "폴더를 삭제하지 못했습니다.");
+    }
   };
 
   return (
@@ -125,10 +138,10 @@ export default function FolderList() {
             </button>
             <button
               type="submit"
-              disabled={!canSaveEdit}
+              disabled={!canSaveEdit || isEditPending}
               className="transition-color btn-primary rounded-md px-4 py-2 text-sm font-medium"
             >
-              저장
+              {isEditPending ? "저장 중..." : "저장"}
             </button>
           </div>
         </form>

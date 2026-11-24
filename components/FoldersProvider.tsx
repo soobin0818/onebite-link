@@ -1,14 +1,20 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  startTransition,
+  useContext,
+  useState,
+  type ReactNode,
+} from "react";
 import type { Folder } from "@/lib/types";
 import { createClient } from "@/utils/supabase/client";
 
 type FoldersContextValue = {
   folders: Folder[];
   addFolder: (name: string) => Promise<void>;
-  removeFolder: (id: number) => void;
-  renameFolder: (id: number, name: string) => void;
+  removeFolder: (id: number, onRemoved?: () => void) => Promise<void>;
+  renameFolder: (id: number, name: string) => Promise<void>;
 };
 
 const FoldersContext = createContext<FoldersContextValue | null>(null);
@@ -37,13 +43,28 @@ export default function FoldersProvider({
     setFolders((prev) => [...prev, data]);
   };
 
-  const removeFolder = (id: number) => {
-    // TODO: 서버 삭제 기능 구현 (현재는 클라이언트 상태에서만 제거)
-    setFolders((prev) => prev.filter((f) => f.id !== id));
+  const removeFolder = async (id: number, onRemoved?: () => void) => {
+    // folders 테이블에서 삭제하고, 성공하면 목록에서도 제거
+    const { error } = await createClient().from("folders").delete().eq("id", id);
+
+    if (error) throw new Error(`폴더를 삭제하지 못했습니다: ${error.message}`);
+
+    // onRemoved(예: 홈 이동)와 목록 제거를 한 transition으로 묶어 404 깜빡임 방지
+    startTransition(() => {
+      onRemoved?.();
+      setFolders((prev) => prev.filter((f) => f.id !== id));
+    });
   };
 
-  const renameFolder = (id: number, name: string) => {
-    // TODO: 서버 수정 기능 구현 (현재는 클라이언트 상태에서만 변경)
+  const renameFolder = async (id: number, name: string) => {
+    // folders 테이블의 이름을 수정하고, 성공하면 목록에도 반영
+    const { error } = await createClient()
+      .from("folders")
+      .update({ name })
+      .eq("id", id);
+
+    if (error) throw new Error(`폴더 이름을 수정하지 못했습니다: ${error.message}`);
+
     setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name } : f)));
   };
 
