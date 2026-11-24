@@ -1,35 +1,60 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition, type FormEvent } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useFolders } from "@/components/FoldersProvider";
+import PencilIcon from "@/components/PencilIcon";
 import SidebarLink from "@/components/SidebarLink";
 import TrashIcon from "@/components/TrashIcon";
 import type { Folder } from "@/lib/types";
 
+const modalClassName =
+  "modal m-auto w-[calc(100%-48px)] max-w-[400px] rounded-lg border border-[var(--border)] bg-[var(--card)] p-0 text-[var(--text)]";
+
 export default function FolderList() {
-  const { folders, removeFolder } = useFolders();
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const [target, setTarget] = useState<Folder | null>(null);
+  const { folders, removeFolder, renameFolder } = useFolders();
+  const editDialogRef = useRef<HTMLDialogElement>(null);
+  const deleteDialogRef = useRef<HTMLDialogElement>(null);
+  const [editTarget, setEditTarget] = useState<Folder | null>(null);
+  const [editName, setEditName] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<Folder | null>(null);
   const [, startTransition] = useTransition();
   const pathname = usePathname();
   const router = useRouter();
 
-  const openConfirm = (folder: Folder) => {
-    setTarget(folder);
-    dialogRef.current?.showModal();
+  const openEdit = (folder: Folder) => {
+    setEditTarget(folder);
+    setEditName(folder.name);
+    editDialogRef.current?.showModal();
   };
-  const close = () => dialogRef.current?.close();
+  const closeEdit = () => editDialogRef.current?.close();
+
+  const openDelete = (folder: Folder) => {
+    setDeleteTarget(folder);
+    deleteDialogRef.current?.showModal();
+  };
+  const closeDelete = () => deleteDialogRef.current?.close();
+
+  const trimmedEditName = editName.trim();
+  const canSaveEdit =
+    trimmedEditName !== "" && trimmedEditName !== editTarget?.name;
+
+  const handleEdit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editTarget || !canSaveEdit) return;
+    renameFolder(editTarget.id, trimmedEditName);
+    closeEdit();
+  };
 
   const handleDelete = () => {
-    if (!target) return;
-    const id = target.id;
+    if (!deleteTarget) return;
+    const id = deleteTarget.id;
     // 보고 있던 폴더를 삭제하면 홈으로 이동 (이동과 삭제를 같은 transition으로 묶어 404 깜빡임 방지)
     startTransition(() => {
       if (pathname === `/folder/${id}`) router.push("/");
       removeFolder(id);
     });
-    close();
+    closeDelete();
   };
 
   return (
@@ -41,28 +66,90 @@ export default function FolderList() {
               <span aria-hidden>📁</span>
               <span className="truncate">{folder.name}</span>
             </SidebarLink>
-            <button
-              type="button"
-              onClick={() => openConfirm(folder)}
-              aria-label={`${folder.name} 폴더 삭제`}
-              title="폴더 삭제"
-              className="folder-delete transition-color absolute top-1/2 right-1 flex size-6 -translate-y-1/2 items-center justify-center rounded text-[var(--text-sub)]"
-            >
-              <TrashIcon />
-            </button>
+            <div className="folder-actions transition-color absolute top-1/2 right-1 flex -translate-y-1/2 items-center gap-0.5">
+              <button
+                type="button"
+                onClick={() => openEdit(folder)}
+                aria-label={`${folder.name} 폴더 이름 수정`}
+                title="폴더 이름 수정"
+                className="folder-action transition-color flex size-6 items-center justify-center rounded text-[var(--text-sub)]"
+              >
+                <PencilIcon />
+              </button>
+              <button
+                type="button"
+                onClick={() => openDelete(folder)}
+                aria-label={`${folder.name} 폴더 삭제`}
+                title="폴더 삭제"
+                className="folder-action folder-action-danger transition-color flex size-6 items-center justify-center rounded text-[var(--text-sub)]"
+              >
+                <TrashIcon />
+              </button>
+            </div>
           </li>
         ))}
       </ul>
 
+      {/* 폴더 이름 수정 모달 */}
       <dialog
-        ref={dialogRef}
-        aria-labelledby="delete-folder-title"
-        onClose={() => setTarget(null)}
+        ref={editDialogRef}
+        aria-labelledby="edit-folder-title"
+        onClose={() => setEditTarget(null)}
         onClick={(e) => {
           // 바깥(backdrop) 클릭 시 닫기
-          if (e.target === e.currentTarget) close();
+          if (e.target === e.currentTarget) closeEdit();
         }}
-        className="modal m-auto w-[calc(100%-48px)] max-w-[400px] rounded-lg border border-[var(--border)] bg-[var(--card)] p-0 text-[var(--text)]"
+        className={modalClassName}
+      >
+        <form onSubmit={handleEdit} className="flex flex-col gap-4 p-6">
+          <h2
+            id="edit-folder-title"
+            className="text-xl leading-[1.3] font-semibold"
+          >
+            폴더 이름 수정
+          </h2>
+          <label className="flex flex-col gap-2">
+            <span className="text-sm leading-[1.4] font-medium">폴더 이름</span>
+            <input
+              type="text"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              onFocus={(e) => e.currentTarget.select()}
+              required
+              autoFocus
+              maxLength={30}
+              className="field transition-color rounded-md px-3 py-2 text-base"
+            />
+          </label>
+          <div className="mt-2 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={closeEdit}
+              className="transition-color btn-secondary rounded-md px-4 py-2 text-sm font-medium"
+            >
+              취소
+            </button>
+            <button
+              type="submit"
+              disabled={!canSaveEdit}
+              className="transition-color btn-primary rounded-md px-4 py-2 text-sm font-medium"
+            >
+              저장
+            </button>
+          </div>
+        </form>
+      </dialog>
+
+      {/* 폴더 삭제 확인 모달 */}
+      <dialog
+        ref={deleteDialogRef}
+        aria-labelledby="delete-folder-title"
+        onClose={() => setDeleteTarget(null)}
+        onClick={(e) => {
+          // 바깥(backdrop) 클릭 시 닫기
+          if (e.target === e.currentTarget) closeDelete();
+        }}
+        className={modalClassName}
       >
         <div className="flex flex-col gap-4 p-6">
           <h2
@@ -72,8 +159,8 @@ export default function FolderList() {
             폴더 삭제
           </h2>
           <p className="text-base leading-[1.6]">
-            <strong className="font-semibold">{target?.name}</strong> 폴더를
-            삭제할까요?
+            <strong className="font-semibold">{deleteTarget?.name}</strong>{" "}
+            폴더를 삭제할까요?
             <br />
             <span className="text-sm leading-[1.4] text-[var(--text-sub)]">
               삭제한 폴더는 되돌릴 수 없어요.
@@ -82,7 +169,7 @@ export default function FolderList() {
           <div className="mt-2 flex justify-end gap-2">
             <button
               type="button"
-              onClick={close}
+              onClick={closeDelete}
               autoFocus
               className="transition-color btn-secondary rounded-md px-4 py-2 text-sm font-medium"
             >

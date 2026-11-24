@@ -7,6 +7,7 @@ type FoldersContextValue = {
   folders: Folder[];
   addFolder: (name: string) => void;
   removeFolder: (id: number) => void;
+  renameFolder: (id: number, name: string) => void;
 };
 
 const FoldersContext = createContext<FoldersContextValue | null>(null);
@@ -35,8 +36,13 @@ export default function FoldersProvider({
     setFolders((prev) => prev.filter((f) => f.id !== id));
   };
 
+  const renameFolder = (id: number, name: string) => {
+    // TODO: 서버 수정 기능 구현 (현재는 클라이언트 상태에서만 변경)
+    setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name } : f)));
+  };
+
   return (
-    <FoldersContext value={{ folders, addFolder, removeFolder }}>
+    <FoldersContext value={{ folders, addFolder, removeFolder, renameFolder }}>
       {children}
     </FoldersContext>
   );
