@@ -2,16 +2,13 @@
 
 import { notFound } from "next/navigation";
 import { useFolders } from "@/components/FoldersProvider";
+import LinkCount from "@/components/LinkCount";
 
 type FolderHeaderProps = {
   folderId: number;
-  linkCount: number;
 };
 
-export default function FolderHeader({
-  folderId,
-  linkCount,
-}: FolderHeaderProps) {
+export default function FolderHeader({ folderId }: FolderHeaderProps) {
   const { folders } = useFolders();
   const folder = folders.find((f) => f.id === folderId);
 
@@ -25,9 +22,7 @@ export default function FolderHeader({
       <h1 className="mt-3 text-[30px] leading-[1.2] font-bold">
         {folder.name}
       </h1>
-      <p className="text-sm leading-[1.4] text-[var(--text-sub)]">
-        링크 {linkCount}개
-      </p>
+      <LinkCount label="링크" folderId={folderId} />
     </header>
   );
 }

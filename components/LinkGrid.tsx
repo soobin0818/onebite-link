@@ -1,12 +1,21 @@
+"use client";
+
 import LinkCard from "@/components/LinkCard";
-import type { LinkItem } from "@/lib/types";
+import { useLinks } from "@/components/LinksProvider";
 
 type LinkGridProps = {
-  links: LinkItem[];
+  /** 지정하면 해당 폴더의 링크만 표시 */
+  folderId?: number;
 };
 
-export default function LinkGrid({ links }: LinkGridProps) {
-  if (links.length === 0) {
+export default function LinkGrid({ folderId }: LinkGridProps) {
+  const { links } = useLinks();
+  const visibleLinks =
+    folderId === undefined
+      ? links
+      : links.filter((link) => link.folderId === folderId);
+
+  if (visibleLinks.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-[var(--border)] bg-[var(--card)] px-6 py-12 text-center">
         <span aria-hidden className="text-[32px] leading-none">
@@ -21,7 +30,7 @@ export default function LinkGrid({ links }: LinkGridProps) {
 
   return (
     <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      {links.map((link) => (
+      {visibleLinks.map((link) => (
         <li key={link.id}>
           <LinkCard link={link} />
         </li>
