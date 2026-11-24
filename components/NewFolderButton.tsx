@@ -6,17 +6,30 @@ import { useFolders } from "@/components/FoldersProvider";
 export default function NewFolderButton() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [name, setName] = useState("");
+  const [isPending, setIsPending] = useState(false);
+  // state는 다음 렌더에 반영되므로, 같은 틱의 연속 클릭까지 막기 위해 ref로도 잠근다
+  const pendingRef = useRef(false);
   const { addFolder } = useFolders();
 
   const open = () => dialogRef.current?.showModal();
   const close = () => dialogRef.current?.close();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const trimmed = name.trim();
-    if (!trimmed) return;
-    addFolder(trimmed);
-    close();
+    if (!trimmed || pendingRef.current) return;
+
+    pendingRef.current = true;
+    setIsPending(true);
+    try {
+      await addFolder(trimmed);
+      close();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "폴더를 추가하지 못했습니다.");
+    } finally {
+      pendingRef.current = false;
+      setIsPending(false);
+    }
   };
 
   return (
@@ -69,10 +82,10 @@ export default function NewFolderButton() {
             </button>
             <button
               type="submit"
-              disabled={!name.trim()}
+              disabled={!name.trim() || isPending}
               className="transition-color btn-primary rounded-md px-4 py-2 text-sm font-medium"
             >
-              저장
+              {isPending ? "저장 중..." : "저장"}
             </button>
           </div>
         </form>

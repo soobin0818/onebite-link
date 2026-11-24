@@ -2,10 +2,11 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { Folder } from "@/lib/types";
+import { createClient } from "@/utils/supabase/client";
 
 type FoldersContextValue = {
   folders: Folder[];
-  addFolder: (name: string) => void;
+  addFolder: (name: string) => Promise<void>;
   removeFolder: (id: number) => void;
   renameFolder: (id: number, name: string) => void;
 };
@@ -23,12 +24,17 @@ export default function FoldersProvider({
 }: FoldersProviderProps) {
   const [folders, setFolders] = useState(initialFolders);
 
-  const addFolder = (name: string) => {
-    // TODO: 서버 저장 기능 구현 (현재는 클라이언트 상태에만 추가)
-    setFolders((prev) => [
-      ...prev,
-      { id: Math.max(0, ...prev.map((f) => f.id)) + 1, name },
-    ]);
+  const addFolder = async (name: string) => {
+    // folders 테이블에 저장하고, DB가 발급한 id로 목록에 추가
+    const { data, error } = await createClient()
+      .from("folders")
+      .insert({ name })
+      .select("id, name")
+      .single();
+
+    if (error) throw new Error(`폴더를 추가하지 못했습니다: ${error.message}`);
+
+    setFolders((prev) => [...prev, data]);
   };
 
   const removeFolder = (id: number) => {
