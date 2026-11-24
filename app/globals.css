@@ -73,6 +73,38 @@ body {
   background: var(--hover-bg);
 }
 
+/* 위험 버튼 (삭제) — 흰 텍스트 명암비 확보를 위해 에러 컬러를 어둡게 조정 */
+.btn-danger {
+  background: #d44c4c;
+  color: #ffffff;
+}
+.btn-danger:hover {
+  background: #bf3f3f;
+}
+
+/* 사이드바 폴더 아이템: 마우스를 올리면 삭제 버튼 노출 */
+.folder-item:hover > a {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+.folder-item:hover > a,
+.folder-item:focus-within > a {
+  padding-right: 36px;
+}
+.folder-delete {
+  opacity: 0;
+  pointer-events: none;
+}
+.folder-item:hover .folder-delete,
+.folder-delete:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.folder-delete:hover {
+  background: #e3e3e0;
+  color: #bf3f3f;
+}
+
 /* 모달 */
 .modal::backdrop {
   background: rgb(15 15 15 / 0.4);

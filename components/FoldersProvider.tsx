@@ -6,6 +6,7 @@ import type { Folder } from "@/lib/types";
 type FoldersContextValue = {
   folders: Folder[];
   addFolder: (name: string) => void;
+  removeFolder: (id: number) => void;
 };
 
 const FoldersContext = createContext<FoldersContextValue | null>(null);
@@ -29,8 +30,15 @@ export default function FoldersProvider({
     ]);
   };
 
+  const removeFolder = (id: number) => {
+    // TODO: 서버 삭제 기능 구현 (현재는 클라이언트 상태에서만 제거)
+    setFolders((prev) => prev.filter((f) => f.id !== id));
+  };
+
   return (
-    <FoldersContext value={{ folders, addFolder }}>{children}</FoldersContext>
+    <FoldersContext value={{ folders, addFolder, removeFolder }}>
+      {children}
+    </FoldersContext>
   );
 }
 
