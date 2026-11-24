@@ -1,12 +1,7 @@
 import FolderList from "@/components/FolderList";
 import SidebarLink from "@/components/SidebarLink";
-import type { Folder } from "@/lib/types";
 
-type SidebarProps = {
-  folders: Folder[];
-};
-
-export default function Sidebar({ folders }: SidebarProps) {
+export default function Sidebar() {
   return (
     <aside className="w-60 shrink-0 border-r border-[var(--border)] bg-[var(--hover-bg)]/50 px-2 py-4">
       <nav className="sticky top-16 flex flex-col gap-4">
@@ -18,7 +13,7 @@ export default function Sidebar({ folders }: SidebarProps) {
           <h2 className="px-3 pb-1 text-xs leading-[1.4] font-semibold text-[var(--text-sub)]">
             폴더
           </h2>
-          <FolderList folders={folders} />
+          <FolderList />
         </div>
       </nav>
     </aside>

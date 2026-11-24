@@ -1,18 +1,18 @@
+"use client";
+
+import { useFolders } from "@/components/FoldersProvider";
 import SidebarLink from "@/components/SidebarLink";
-import type { Folder } from "@/lib/types";
 
-type FolderListProps = {
-  folders: Folder[];
-};
+export default function FolderList() {
+  const { folders } = useFolders();
 
-export default function FolderList({ folders }: FolderListProps) {
   return (
     <ul className="flex flex-col gap-0.5">
       {folders.map((folder) => (
         <li key={folder.id}>
           <SidebarLink href={`/folder/${folder.id}`}>
             <span aria-hidden>📁</span>
-            {folder.name}
+            <span className="truncate">{folder.name}</span>
           </SidebarLink>
         </li>
       ))}

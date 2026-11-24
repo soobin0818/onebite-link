@@ -58,8 +58,24 @@ body {
   background: var(--accent-hover);
 }
 .btn-primary:disabled {
+  background: var(--accent);
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* 보조 버튼 */
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.btn-secondary:hover {
+  background: var(--hover-bg);
+}
+
+/* 모달 */
+.modal::backdrop {
+  background: rgb(15 15 15 / 0.4);
 }
 
 /* 입력 필드 / 셀렉트 */

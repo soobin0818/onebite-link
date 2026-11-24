@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import FolderHeader from "@/components/FolderHeader";
 import LinkGrid from "@/components/LinkGrid";
 import { folders, links } from "@/lib/mock-data";
 
@@ -10,25 +10,13 @@ export default async function FolderPage({
   params,
 }: PageProps<"/folder/[id]">) {
   const { id } = await params;
-  const folder = folders.find((f) => String(f.id) === id);
+  const folderId = Number(id);
+  const folderLinks = links.filter((link) => link.folderId === folderId);
 
-  if (!folder) notFound();
-
-  const folderLinks = links.filter((link) => link.folderId === folder.id);
-
+  // 새로 추가한 폴더는 클라이언트 상태에만 있으므로 폴더 조회·404 처리는 FolderHeader에서 한다
   return (
     <section className="flex flex-col gap-8">
-      <header className="flex flex-col gap-1">
-        <span aria-hidden className="text-[40px] leading-none">
-          📁
-        </span>
-        <h1 className="mt-3 text-[30px] leading-[1.2] font-bold">
-          {folder.name}
-        </h1>
-        <p className="text-sm leading-[1.4] text-[var(--text-sub)]">
-          링크 {folderLinks.length}개
-        </p>
-      </header>
+      <FolderHeader folderId={folderId} linkCount={folderLinks.length} />
       <LinkGrid links={folderLinks} />
     </section>
   );

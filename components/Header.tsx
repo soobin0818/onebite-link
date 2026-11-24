@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NewFolderButton from "@/components/NewFolderButton";
 
 export default function Header() {
   return (
@@ -10,12 +11,15 @@ export default function Header() {
         <span aria-hidden>🔖</span>
         한입 링크
       </Link>
-      <Link
-        href="/new"
-        className="transition-color btn-primary flex items-center rounded-md px-4 py-2 text-sm leading-none font-medium"
-      >
-        + 새 링크
-      </Link>
+      <div className="flex items-center gap-2">
+        <NewFolderButton />
+        <Link
+          href="/new"
+          className="transition-color btn-primary flex items-center rounded-md border border-transparent px-4 py-2 text-sm leading-none font-medium"
+        >
+          + 새 링크
+        </Link>
+      </div>
     </header>
   );
 }

@@ -1,5 +1,4 @@
 import NewLinkForm from "@/components/NewLinkForm";
-import { folders } from "@/lib/mock-data";
 
 export default function NewLinkPage() {
   return (
@@ -11,7 +10,7 @@ export default function NewLinkPage() {
         </p>
       </header>
       <div className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-6">
-        <NewLinkForm folders={folders} />
+        <NewLinkForm />
       </div>
     </section>
   );

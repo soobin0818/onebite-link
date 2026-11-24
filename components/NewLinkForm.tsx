@@ -3,13 +3,11 @@
 import type { FormEvent } from "react";
 import LinkUrlInput from "@/components/LinkUrlInput";
 import FolderSelect from "@/components/FolderSelect";
-import type { Folder } from "@/lib/types";
+import { useFolders } from "@/components/FoldersProvider";
 
-type NewLinkFormProps = {
-  folders: Folder[];
-};
+export default function NewLinkForm() {
+  const { folders } = useFolders();
 
-export default function NewLinkForm({ folders }: NewLinkFormProps) {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     // TODO: 저장 기능 구현 (현재는 UI만 구현)
     e.preventDefault();
