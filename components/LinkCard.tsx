@@ -32,7 +32,7 @@ export default function LinkCard({ link }: LinkCardProps) {
         />
       )}
       <div className="flex flex-col gap-3 p-4">
-        <div className="flex items-center gap-3">
+        <div className="link-card-head flex items-center gap-3">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-[var(--hover-bg)] text-sm font-semibold uppercase">
             {hostname[0]}
           </span>

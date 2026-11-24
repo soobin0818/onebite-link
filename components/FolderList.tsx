@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition, type FormEvent } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { useFolders } from "@/components/FoldersProvider";
 import PencilIcon from "@/components/PencilIcon";
 import SidebarLink from "@/components/SidebarLink";
@@ -14,7 +15,6 @@ const modalClassName =
 export default function FolderList() {
   const { folders, removeFolder, renameFolder } = useFolders();
   const editDialogRef = useRef<HTMLDialogElement>(null);
-  const deleteDialogRef = useRef<HTMLDialogElement>(null);
   const [editTarget, setEditTarget] = useState<Folder | null>(null);
   const [editName, setEditName] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Folder | null>(null);
@@ -29,11 +29,6 @@ export default function FolderList() {
   };
   const closeEdit = () => editDialogRef.current?.close();
 
-  const openDelete = (folder: Folder) => {
-    setDeleteTarget(folder);
-    deleteDialogRef.current?.showModal();
-  };
-  const closeDelete = () => deleteDialogRef.current?.close();
 
   const trimmedEditName = editName.trim();
   const canSaveEdit =
@@ -54,7 +49,6 @@ export default function FolderList() {
       if (pathname === `/folder/${id}`) router.push("/");
       removeFolder(id);
     });
-    closeDelete();
   };
 
   return (
@@ -78,7 +72,7 @@ export default function FolderList() {
               </button>
               <button
                 type="button"
-                onClick={() => openDelete(folder)}
+                onClick={() => setDeleteTarget(folder)}
                 aria-label={`${folder.name} 폴더 삭제`}
                 title="폴더 삭제"
                 className="folder-action folder-action-danger transition-color flex size-6 items-center justify-center rounded text-[var(--text-sub)]"
@@ -140,51 +134,19 @@ export default function FolderList() {
         </form>
       </dialog>
 
-      {/* 폴더 삭제 확인 모달 */}
-      <dialog
-        ref={deleteDialogRef}
-        aria-labelledby="delete-folder-title"
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="폴더 삭제"
+        onConfirm={handleDelete}
         onClose={() => setDeleteTarget(null)}
-        onClick={(e) => {
-          // 바깥(backdrop) 클릭 시 닫기
-          if (e.target === e.currentTarget) closeDelete();
-        }}
-        className={modalClassName}
       >
-        <div className="flex flex-col gap-4 p-6">
-          <h2
-            id="delete-folder-title"
-            className="text-xl leading-[1.3] font-semibold"
-          >
-            폴더 삭제
-          </h2>
-          <p className="text-base leading-[1.6]">
-            <strong className="font-semibold">{deleteTarget?.name}</strong>{" "}
-            폴더를 삭제할까요?
-            <br />
-            <span className="text-sm leading-[1.4] text-[var(--text-sub)]">
-              삭제한 폴더는 되돌릴 수 없어요.
-            </span>
-          </p>
-          <div className="mt-2 flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={closeDelete}
-              autoFocus
-              className="transition-color btn-secondary rounded-md px-4 py-2 text-sm font-medium"
-            >
-              취소
-            </button>
-            <button
-              type="button"
-              onClick={handleDelete}
-              className="transition-color btn-danger rounded-md px-4 py-2 text-sm font-medium"
-            >
-              삭제
-            </button>
-          </div>
-        </div>
-      </dialog>
+        <strong className="font-semibold">{deleteTarget?.name}</strong> 폴더를
+        삭제할까요?
+        <br />
+        <span className="text-sm leading-[1.4] text-[var(--text-sub)]">
+          삭제한 폴더는 되돌릴 수 없어요.
+        </span>
+      </ConfirmDialog>
     </>
   );
 }

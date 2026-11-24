@@ -6,6 +6,7 @@ import type { LinkItem } from "@/lib/types";
 type LinksContextValue = {
   links: LinkItem[];
   addLink: (link: Omit<LinkItem, "id">) => void;
+  removeLink: (id: number) => void;
 };
 
 const LinksContext = createContext<LinksContextValue | null>(null);
@@ -30,7 +31,16 @@ export default function LinksProvider({
     ]);
   };
 
-  return <LinksContext value={{ links, addLink }}>{children}</LinksContext>;
+  const removeLink = (id: number) => {
+    // TODO: 서버 삭제 기능 구현 (현재는 클라이언트 상태에서만 제거)
+    setLinks((prev) => prev.filter((l) => l.id !== id));
+  };
+
+  return (
+    <LinksContext value={{ links, addLink, removeLink }}>
+      {children}
+    </LinksContext>
+  );
 }
 
 export function useLinks() {
