@@ -8,7 +8,7 @@ import { createClient } from "@/utils/supabase/client";
 type LinksContextValue = {
   links: LinkItem[];
   addLink: (link: Omit<LinkItem, "id">) => Promise<void>;
-  removeLink: (id: number) => void;
+  removeLink: (id: number) => Promise<void>;
   updateLink: (
     id: number,
     changes: Pick<LinkItem, "folderId" | "title" | "description">,
@@ -48,8 +48,12 @@ export default function LinksProvider({
     setLinks((prev) => [toLinkItem(data), ...prev]);
   };
 
-  const removeLink = (id: number) => {
-    // TODO: 서버 삭제 기능 구현 (현재는 클라이언트 상태에서만 제거)
+  const removeLink = async (id: number) => {
+    // links 테이블에서 삭제하고, 성공하면 목록에서도 제거
+    const { error } = await createClient().from("links").delete().eq("id", id);
+
+    if (error) throw new Error(`링크를 삭제하지 못했습니다: ${error.message}`);
+
     setLinks((prev) => prev.filter((l) => l.id !== id));
   };
 

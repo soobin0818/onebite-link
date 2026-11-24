@@ -69,7 +69,16 @@ export default function LinkGrid({ folderId }: LinkGridProps) {
       <ConfirmDialog
         open={deleteTarget !== null}
         title="링크 삭제"
-        onConfirm={() => deleteTarget && removeLink(deleteTarget.id)}
+        onConfirm={async () => {
+          if (!deleteTarget) return;
+          try {
+            await removeLink(deleteTarget.id);
+          } catch (error) {
+            alert(
+              error instanceof Error ? error.message : "링크를 삭제하지 못했습니다.",
+            );
+          }
+        }}
         onClose={() => setDeleteTarget(null)}
       >
         <strong className="font-semibold">{deleteTarget?.title}</strong>{" "}
