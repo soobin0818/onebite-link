@@ -15,14 +15,17 @@ export default function NewLinkForm() {
   const [pending, setPending] = useState(false);
   const pendingRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  // Cache Components는 이동한 페이지를 숨겨서 상태째 보존하므로(Activity),
-  // 저장 후 화면이 숨겨질 때 잠금을 풀어 다음에 새 링크 페이지에 왔을 때 버튼이 잠겨 있지 않게 한다
+  // Cache Components는 이동한 페이지를 숨겨서 React 상태와 입력값(DOM)까지 보존하므로(Activity),
+  // 화면이 숨겨질 때 잠금을 풀고 입력칸을 비워 다음에 새 링크 페이지에 왔을 때 빈 폼으로 시작하게 한다
   useLayoutEffect(() => {
+    const form = formRef.current;
     return () => {
       pendingRef.current = false;
       setPending(false);
       setError(null);
+      form?.reset();
     };
   }, []);
 
@@ -81,7 +84,11 @@ export default function NewLinkForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-4"
+    >
       <LinkUrlInput name="url" />
       <FolderSelect name="folderId" folders={folders} />
       {error && (
