@@ -2,7 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
 
 // 로그인하지 않아도 열 수 있는 페이지. 그 밖의 페이지(인덱스·폴더별·새 링크 등)는 로그인이 필요하다
-const PUBLIC_PATHS = ["/login", "/signup"];
+// /reset-password는 재설정 링크로 로그인된 상태에서만 열 수 있으므로 여기에 넣지 않는다
+const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/auth/confirm"];
 
 // Next.js 16부터 middleware는 proxy로 이름이 바뀌었다
 export async function proxy(request: NextRequest) {

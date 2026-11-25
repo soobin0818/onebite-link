@@ -14,6 +14,10 @@ const MESSAGES: Record<string, string> = {
   email_provider_disabled: "현재 이메일로 회원가입을 할 수 없어요.",
   over_email_send_rate_limit:
     "인증 메일 요청이 너무 많아요. 잠시 후 다시 시도해 주세요.",
+  // 비밀번호 재설정
+  same_password: "새 비밀번호가 기존 비밀번호와 같아요. 다른 비밀번호를 입력해 주세요.",
+  session_not_found:
+    "재설정 링크가 만료됐어요. 비밀번호 찾기를 다시 진행해 주세요.",
   // 공통
   email_address_invalid: "올바른 이메일 주소를 입력해 주세요.",
   validation_failed: "입력한 정보를 다시 확인해 주세요.",

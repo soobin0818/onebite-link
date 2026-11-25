@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Toast from "@/components/Toast";
 import { createClient } from "@/utils/supabase/client";
@@ -10,6 +10,15 @@ export default function LogoutButton() {
   const [pending, setPending] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const closeToast = useCallback(() => setToast(null), []);
+
+  // Cache Components는 이동한 페이지를 숨겨서 상태째 보존하므로(Activity),
+  // 화면이 숨겨질 때 "로그아웃하는 중" 상태를 풀어 다시 로그인했을 때 그대로 남지 않게 한다
+  useLayoutEffect(() => {
+    return () => {
+      setPending(false);
+      setToast(null);
+    };
+  }, []);
 
   const handleLogout = async () => {
     if (pending) return;

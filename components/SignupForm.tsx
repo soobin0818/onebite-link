@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useRef, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { useRouter } from "next/navigation";
 import AuthField from "@/components/AuthField";
 import Toast from "@/components/Toast";
@@ -16,6 +22,18 @@ export default function SignupForm() {
   const pendingRef = useRef(false);
   const [toast, setToast] = useState<string | null>(null);
   const closeToast = useCallback(() => setToast(null), []);
+
+  // Cache Components는 이동한 페이지를 숨겨서 상태째 보존하므로(Activity),
+  // 화면이 숨겨질 때 진행 상태와 비밀번호를 비워 다시 왔을 때 버튼이 잠겨 있지 않게 한다
+  useLayoutEffect(() => {
+    return () => {
+      pendingRef.current = false;
+      setPending(false);
+      setPassword("");
+      setPasswordConfirm("");
+      setToast(null);
+    };
+  }, []);
 
   // 세 칸을 모두 채워야 회원가입 버튼을 누를 수 있다
   const filled =
