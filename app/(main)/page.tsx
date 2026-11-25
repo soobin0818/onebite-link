@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
 import LinkCount from "@/components/LinkCount";
 import LinkGrid from "@/components/LinkGrid";
+import { pageMetadata } from "@/lib/metadata";
+
+export const metadata: Metadata = pageMetadata({
+  title: "전체 링크",
+  description: "저장한 모든 링크를 한눈에 확인하세요.",
+  path: "/",
+});
 
 export default function Home() {
   return (

@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import NewLinkForm from "@/components/NewLinkForm";
+import { pageMetadata } from "@/lib/metadata";
+
+export const metadata: Metadata = pageMetadata({
+  title: "새 링크",
+  description: "저장할 링크를 입력하고 폴더를 선택해 추가하세요.",
+  path: "/new",
+});
 
 export default function NewLinkPage() {
   return (

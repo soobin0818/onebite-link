@@ -3,10 +3,13 @@ import Link from "next/link";
 import { Suspense } from "react";
 import ForgotPasswordForm from "@/components/ForgotPasswordForm";
 import SearchParamErrorToast from "@/components/SearchParamErrorToast";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
-  title: "비밀번호 찾기 | 한입 링크",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "비밀번호 찾기",
+  description: "가입한 이메일로 비밀번호 재설정 링크를 받아 보세요.",
+  path: "/forgot-password",
+});
 
 export default function ForgotPasswordPage() {
   return (

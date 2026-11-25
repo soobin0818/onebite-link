@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import ResetPasswordForm from "@/components/ResetPasswordForm";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
-  title: "비밀번호 재설정 | 한입 링크",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "비밀번호 재설정",
+  description: "한입 링크에서 사용할 새 비밀번호를 설정하세요.",
+  path: "/reset-password",
+});
 
 // 재설정 링크(/auth/confirm)를 거쳐 로그인된 상태에서만 열린다 (proxy.ts에서 확인)
 export default function ResetPasswordPage() {

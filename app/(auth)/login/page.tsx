@@ -4,10 +4,13 @@ import { Suspense } from "react";
 import KakaoLoginButton from "@/components/KakaoLoginButton";
 import LoginForm from "@/components/LoginForm";
 import SearchParamErrorToast from "@/components/SearchParamErrorToast";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
-  title: "로그인 | 한입 링크",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "로그인",
+  description: "한입 링크에 로그인하고 저장해 둔 링크를 확인하세요.",
+  path: "/login",
+});
 
 export default function LoginPage() {
   return (
