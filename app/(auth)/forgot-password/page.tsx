@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import ForgotPasswordForm from "@/components/ForgotPasswordForm";
-import InvalidLinkToast from "@/components/InvalidLinkToast";
+import SearchParamErrorToast from "@/components/SearchParamErrorToast";
 
 export const metadata: Metadata = {
   title: "비밀번호 찾기 | 한입 링크",
@@ -13,7 +13,12 @@ export default function ForgotPasswordPage() {
     <section className="flex flex-col gap-6">
       {/* 쿼리스트링을 읽는 부분만 Suspense로 감싸 폼은 정적으로 그린다 */}
       <Suspense fallback={null}>
-        <InvalidLinkToast />
+        <SearchParamErrorToast
+          messages={{
+            invalid_link:
+              "재설정 링크가 만료됐거나 올바르지 않아요. 링크를 다시 요청해 주세요.",
+          }}
+        />
       </Suspense>
       <div className="flex flex-col gap-1 text-center">
         <h1 className="text-xl leading-[1.3] font-semibold">비밀번호 찾기</h1>

@@ -196,3 +196,11 @@ body {
     transform: translateY(0);
   }
 }
+
+/* 카카오 로그인 버튼(이미지): 호버 시 살짝 어둡게 */
+.kakao-login {
+  transition: filter 0.15s ease;
+}
+.kakao-login:hover:not(:disabled) {
+  filter: brightness(0.96);
+}
