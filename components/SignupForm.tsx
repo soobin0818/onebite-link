@@ -42,7 +42,12 @@ export default function SignupForm() {
       });
 
       if (error) {
-        setToast(toKoreanAuthError(error));
+        setToast(
+          toKoreanAuthError(
+            error,
+            "회원가입에 실패했어요. 잠시 후 다시 시도해 주세요.",
+          ),
+        );
         return;
       }
       // 이메일 인증을 켜 둔 경우, 이미 가입된 이메일이면 오류 대신 identities가 빈 사용자를 돌려준다
