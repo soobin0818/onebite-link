@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import FoldersProvider from "@/components/FoldersProvider";
+import { requireUser } from "@/lib/auth";
 import type { Folder } from "@/lib/types";
 import { createClient } from "@/utils/supabase/server";
 
@@ -10,6 +11,9 @@ export default async function FoldersLoader({
 }: {
   children: ReactNode;
 }) {
+  // 헤더·사이드바가 있는 모든 페이지가 이 로더를 거치므로, 여기서 로그인 여부를 확인한다
+  await requireUser();
+
   const supabase = createClient(await cookies());
   const { data, error } = await supabase
     .from("folders")
